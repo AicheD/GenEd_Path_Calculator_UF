@@ -1,84 +1,62 @@
 import http.client
 import json
 
-conn = http.client.HTTPSConnection("one.ufl.edu")
-url = "/apix/soc/schedule/?category=CWSP&term=2238&ge-h=true"
-# Make request to the API
-conn.request("GET", url)
-response = conn.getresponse()
-data = response.read()
 
-# Parse the JSON data
-parsed_data = json.loads(data)
-total_rows = parsed_data[0]["TOTALROWS"]
-remaining_rows = total_rows
-
-while True:
-    # Do something with the retrieved data here...
-    #print(parsed_data)
-
-    retrieved_rows = parsed_data[0]["RETRIEVEDROWS"]
-    remaining_rows -= retrieved_rows
-    # Check if there are remaining rows
-    if remaining_rows <= 0:
-        break
-
-    last_control_num = parsed_data[0]["LASTCONTROLNUMBER"]
-    print(last_control_num)
-    # Update the URL with the last control number
-    url = f"/apix/soc/schedule/?category=CWSP&term=2238&ge-h=true&last-control-number={last_control_num}"
-    print(url)
-
-    # Make request to the API with the updated URL
+def get_courses(conn, category):
+    url = f"/apix/soc/schedule/?category={category}&term=2238"
+    # Make request to the API
     conn.request("GET", url)
     response = conn.getresponse()
     data = response.read()
-    # Parse the JSON data again
+
+    # Parse the JSON data
     parsed_data = json.loads(data)
+    total_rows = parsed_data[0]["TOTALROWS"]
+    remaining_rows = total_rows
 
+    ''' printing data --- testing
+    print(data.decode("utf-8"))
 
-'''import http.client
-import json
+    for i in range(len(parsed_data[0]["COURSES"])):
+        print(parsed_data[0]["COURSES"][i]["name"])
+        print([i])
+    '''
 
-conn = http.client.HTTPSConnection("one.ufl.edu")
+    # Create an empty container (will be defined to more precise data structure later) to store the courses
+    courses = []
 
-# conn.request("GET", "/apix/soc/schedule/?category=CWSP&term=2238")
-conn.request("GET", "/apix/soc/schedule/?category=CWSP&term=2238&ge-h=true&last-row=10")
+    while True:
+        for course in parsed_data[0]["COURSES"]:
+            course_data = {
+                "name": course["name"],
+                "code": course["code"],
+                # Add any other attributes to store here
+            }
+            courses.append(course_data)
 
-res = conn.getresponse()
-data = res.read()
-# Parse the JSON data
-parsed_data = json.loads(data)
-# print(parsed_data)
+        retrieved_rows = parsed_data[0]["RETRIEVEDROWS"]
+        remaining_rows -= retrieved_rows
+        if remaining_rows <= 0:
+            break
 
-# see raw data contents
-# print(data.decode("utf-8"))
+        last_control_num = parsed_data[0]["LASTCONTROLNUMBER"]
+        url = f"/apix/soc/schedule/?category={category}&term=2238&last-control-number={last_control_num}"
 
-last_control_num = parsed_data[0]["LASTCONTROLNUMBER"]
-total_rows = parsed_data[0]["TOTALROWS"]
-retrieved_rows = parsed_data[0]["RETRIEVEDROWS"]
-remaining_rows = total_rows - retrieved_rows
-'''
+        # Make request to the API with the updated URL
+        conn.request("GET", url)
+        response = conn.getresponse()
+        data = response.read()
+        # Parse the JSON data again
+        parsed_data = json.loads(data)
 
+    return courses
 
-''' FUNCTIONAL
-# Create a dictionary of dictionaries, this collects genEd courses if there are any
-gen_ed_courses = {}
-for course in parsed_data[0]['COURSES']:
-    if 'genEd' in course:
-        for tag in course['genEd']:
-            if tag not in gen_ed_courses:
-                gen_ed_courses[tag] = {}
-            gen_ed_courses[tag][course['code']] = course
+# Make the HTTP connection
+connection = http.client.HTTPSConnection("one.ufl.edu")
 
-# Print the dictionary of dictionaries
-print(gen_ed_courses)
-'''
-
-''' printing data --- testing
-print(data.decode("utf-8"))
-
-for i in range(len(parsed_data[0]["COURSES"])):
-    print(parsed_data[0]["COURSES"][i]["name"])
-    print([i])
-'''
+# Get the courses for each category --- only humanities being demostrated
+humanities_courses = get_courses(connection, "CWSP&ge-b=true")
+# example looping and printing values for all humanities courses
+# Print the courses
+for course in humanities_courses:
+    print(course["name"], course["code"])
