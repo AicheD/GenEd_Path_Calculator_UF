@@ -99,10 +99,6 @@ humanities_courses = get_courses(connection, "CWSP&ge-h=true")
 '''for course in humanities_courses:
     print(course["name"], course["code"], course["instructors_list"])'''
 
-rate_my_prof_page = requests.get("http://www.ratemyprofessors.com/filter/professor/?&page=1&filter=teacherlastname_sort_s+asc&query=*%3A*&queryoption=TEACHER&queryBy=schoolId&sid=1100")
-rmp_data = json.loads(rate_my_prof_page.content)
-# print(rmp_data.decode("utf-8"))
-
 genEdType = int(input(
     "What gen-ed requirement would you like to fulfill?\n" +
     "1. Biological Sciences\n" +
