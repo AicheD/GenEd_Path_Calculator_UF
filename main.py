@@ -32,7 +32,9 @@ def get_courses(conn, category):
             instructors_list = []
             # the set below is used to check for duplicate instructors across sections before adding to instructor_list
             instructors_set = set()
+            credit_amount = ""
             for section in course["sections"]:
+                credit_amount = section["credits"]
                 for instructor in section["instructors"]:
                     name = instructor["name"]
                     if name not in instructors_set:
@@ -41,6 +43,7 @@ def get_courses(conn, category):
             course_data = {
                 "name": course["name"],
                 "code": course["code"],
+                "credits": credit_amount,
                 "instructors_list": instructors_list,
                 # Add any other attributes to store here
             }
@@ -96,8 +99,8 @@ connection = http.client.HTTPSConnection("one.ufl.edu")
 humanities_courses = get_courses(connection, "CWSP&ge-h=true")
 # Example looping and printing values for all humanities courses
 # Print the courses
-'''for course in humanities_courses:
-    print(course["name"], course["code"], course["instructors_list"])'''
+''' for course in humanities_courses:
+    print(course["name"], course["code"], course["instructors_list"], course["credits"]) '''
 
 genEdType = int(input(
     "What gen-ed requirement would you like to fulfill?\n" +
