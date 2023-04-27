@@ -60,3 +60,15 @@ humanities_courses = get_courses(connection, "CWSP&ge-b=true")
 # Print the courses
 for course in humanities_courses:
     print(course["name"], course["code"])
+
+genEdType = int(input(
+    "What gen-ed requirement would you like to fulfill?\n" +
+    "1. Biological and Physical Sciences\n" +
+    "2. Composition\n" +
+    "3. Social & Behavioral Science\n" +
+    "4. Mathematics\n" +
+    "Enter a number 1-4 corresponding to the above gen-ed category:"
+))
+
+numOfCredits = int(input("How many credits would you like your gen-ed class to be?"))
+
