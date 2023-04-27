@@ -1,5 +1,6 @@
 import http.client
 import json
+from lxml import etree
 
 
 def get_courses(conn, category):
@@ -51,6 +52,31 @@ def get_courses(conn, category):
 
     return courses
 
+def get_avgRating(profName):
+    connection = http.client.HTTPSConnection("www.ratemyprofessors.com")
+    url = f"/search/teachers?query={profName}&sid=1100"
+
+    connection.request("GET", url)
+    response = connection.getresponse()
+    data = str(response.read())
+
+    root = etree.HTML(data)[0]
+
+    for child in root:
+        if child.tag == 'script':
+            if(child.text == None):
+                continue
+            else:
+                index = child.text.find("avgRating")
+                if index != -1:
+                    index += 11
+                    if child.text[index:index+1] == '0':
+                        rating = 0.0
+                    else:
+                        rating = float(child.text[index:index+3])
+
+    return rating
+
 # Make the HTTP connection
 connection = http.client.HTTPSConnection("one.ufl.edu")
 
@@ -63,12 +89,16 @@ for course in humanities_courses:
 
 genEdType = int(input(
     "What gen-ed requirement would you like to fulfill?\n" +
-    "1. Biological and Physical Sciences\n" +
+    "1. Biological Sciences\n" +
     "2. Composition\n" +
-    "3. Social & Behavioral Science\n" +
-    "4. Mathematics\n" +
-    "Enter a number 1-4 corresponding to the above gen-ed category:"
+    "3. Diversity\n" +
+    "4. Humanities\n" +
+    "5. International\n" +
+    "6. Mathematics\n" +
+    "7. Physical Sciences\n" +
+    "8. Social and Behavioral Sciences\n" +
+    "Enter a number 1-8 corresponding to the above gen-ed category: "
 ))
 
-numOfCredits = int(input("How many credits would you like your gen-ed class to be?"))
+numOfCredits = int(input("How many credits would you like your gen-ed class to be? "))
 
