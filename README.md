@@ -3,4 +3,4 @@ Aims to calculate the best courses to fulfill general education requirements for
 
 This program is implemented via a Python script that pulls information from UF's public Courses API as well as scrapes RateMyProfessors.com to retrieve professor ratings.
 
-User input is desired gen-ed category and number of credit hours
+The design asks the user for their desired gen-ed category to fulfill and the number of credit hours they would like the course to be
